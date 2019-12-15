@@ -1,0 +1,4 @@
+"0",""
+"0","worlddatadf<-data.frame(PC1=worlddata_pca$scores[,1], PC2=worlddata_pca$scores[,2])"
+"0",""
+"0","ggplot(worlddatadf,aes(PC1, PC2))+geom_point()"

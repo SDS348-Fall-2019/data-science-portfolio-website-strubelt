@@ -1,0 +1,2 @@
+"0",""
+"0","worlddata%>%group_by(Country)%>%mutate(Total_servings=sum(beer_servings,spirit_servings,wine_servings))%>%group_by(Region)%>%select(Region,`Happiness Score`,Total_servings)%>%summarize(mean_total_servings=mean(Total_servings),mean_happiness_score=mean(`Happiness Score`))%>%arrange(desc(mean_happiness_score))"

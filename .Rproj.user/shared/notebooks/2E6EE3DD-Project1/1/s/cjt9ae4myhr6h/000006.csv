@@ -1,0 +1,2 @@
+"0",""
+"0","worlddata_pca$scores%>%as.data.frame%>%cbind(Country,.)%>%top_n(5,Comp.2)"

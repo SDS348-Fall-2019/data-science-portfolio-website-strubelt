@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Blogs on John Ryan Strubelt</title>
+    <link>/blog/</link>
+    <description>Recent content in Blogs on John Ryan Strubelt</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-US</language>
+    <lastBuildDate>Sun, 15 Dec 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/blog/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Fall 2019</title>
+      <link>/blog/december-2019/</link>
+      <pubDate>Sun, 15 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/blog/december-2019/</guid>
+      <description>Fall 2019… Where to even start. The followig semster has been insane. This semester by far was the hardest that I ever had. I was registered for 16 hours, worked 40+ hours a week, but some how I still made it to the end. I walked into this semster worried because of the classes that I was registered for. The two that I was worried the most about pertained to my major but they ended up being the classes that I enjoyed the most.</description>
+    </item>
+    
+  </channel>
+</rss>

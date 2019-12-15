@@ -1,0 +1,1 @@
+"0","worlddata%>%na.omit%>%group_by(Region)%>%summarize(mean_happiness=mean(`Happiness Score`,na.rm = T),sd_happiness=sd(`Happiness Score`,na.rm = T))%>%arrange(desc(mean_happiness)) "

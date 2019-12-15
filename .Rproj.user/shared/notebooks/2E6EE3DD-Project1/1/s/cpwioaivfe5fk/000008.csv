@@ -1,0 +1,2 @@
+"0",""
+"0","worlddata%>%group_by(Region)%>%summarize(mean_life_expectancy=mean(`Health (Life Expectancy)`),sd_life_expectancy=sd(`Health (Life Expectancy)`))"

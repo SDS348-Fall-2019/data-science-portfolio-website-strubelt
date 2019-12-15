@@ -1,0 +1,2 @@
+"0",""
+"0","worlddata%>%group_by(Region)%>%summarize(mean_beers=mean(beer_servings,na.rm = T),sd_beers=sd(beer_servings,na.rm=T))%>%arrange(desc(mean_beers))"

@@ -1,0 +1,1 @@
+"0","samp_distn%>%t%>%as.data.frame%>%gather%>%group_by(key)%>%summarize(lower=quantile(value,.025),upper=quantile(value,.975))"

@@ -1,0 +1,2 @@
+"0",""
+"0","worlddata%>%group_by(Region)%>%summarize(mean_happiness_rank=mean(`Happiness Rank`,na.rm = T),sd_happiness_rank=sd(`Happiness Rank`,na.rm = T))%>%arrange(mean_happiness_rank)"

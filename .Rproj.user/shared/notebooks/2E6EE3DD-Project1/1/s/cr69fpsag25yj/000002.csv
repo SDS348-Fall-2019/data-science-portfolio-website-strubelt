@@ -1,0 +1,1 @@
+"0","ggplot(worlddata,aes(x=worlddata$`Happiness Score`,y=worlddata$`Health (Life Expectancy)`,color=`Economy (GDP per Capita)`))+scale_color_gradient(low=""yellow"", high=""blue"")+labs( x = ""Happiness Score"", y = ""Life Expectancy(Health)"",title =""Happiness Equal to Life Expectancy?"")+geom_point(size=2,alpha=.5)+theme_minimal()"

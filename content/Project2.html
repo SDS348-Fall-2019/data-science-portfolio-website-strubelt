@@ -1,0 +1,398 @@
+---
+title: "Project 2: Modeling"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+
+<p>##*John Ryan Strubelt Jrs7346</p>
+<p>##<em>Introduction</em>
+I choose the following Data because it meet all the requirements for the project. There are 5 variables, there 118 observations.There is 2 Categorical Variables, 1 of which has 3 categories, and the other which has the potential to be binary. The 5 variables are Race in which the race can be Black, White or Hispanic. Then there is the position of the firefighter and that is Captain or Leut. and then the 3 categorical variables are Written score, Oral score, and Combined. However Combined is manipulated due to the fact that it incorperates 60% of the Written and 40% of the Oral.</p>
+<pre class="r"><code>library(Stat2Data)
+library(dplyr)
+library(tidyr)
+data(Ricci)</code></pre>
+<p>##<em>MANOVA</em></p>
+<pre class="r"><code>library(ggplot2)
+head(Ricci)</code></pre>
+<pre><code>##   Race Position  Oral Written Combine
+## 1    W  Captain 89.52      95  92.808
+## 2    W  Captain 80.00      95  89.000
+## 3    W  Captain 82.38      87  85.152
+## 4    W  Captain 88.57      76  81.028
+## 5    W  Captain 76.19      84  80.876
+## 6    H  Captain 76.19      82  79.676</code></pre>
+<pre class="r"><code>man1&lt;-manova(cbind(Oral,Written)~Race,data=Ricci)
+#Ho:For Oral score and Written score, means for each Race are equal
+#Ha:Oral score or Written score, for alteast one Races mean differ
+summary(man1)</code></pre>
+<pre><code>##            Df  Pillai approx F num Df den Df    Pr(&gt;F)    
+## Race        2 0.31679   10.822      4    230 4.689e-08 ***
+## Residuals 115                                             
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>#Significant, So since they are significant we reject the null meaning that there is some difference between the means. With that we are now going to do Univariate Anovas to get a better look at the variables.
+summary(aov(Oral~Race,data = Ricci))</code></pre>
+<pre><code>##              Df Sum Sq Mean Sq F value   Pr(&gt;F)    
+## Race          2   2553  1276.7   9.472 0.000156 ***
+## Residuals   115  15500   134.8                     
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>summary(aov(Written~Race,data = Ricci))</code></pre>
+<pre><code>##              Df Sum Sq Mean Sq F value   Pr(&gt;F)    
+## Race          2   2585  1292.3      14 3.63e-06 ***
+## Residuals   115  10618    92.3                     
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>#There is significant difference between average oral exam scores between races. There is also a significant difference for the written. With that being said, a post hoc analysis will be ran to see which groups differ.
+pairwise.t.test(Ricci$Oral,Ricci$Race,p.adj=&quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  Ricci$Oral and Ricci$Race 
+## 
+##   B     H      
+## H 0.038 -      
+## W 0.058 3.9e-05
+## 
+## P value adjustment method: none</code></pre>
+<pre class="r"><code>#There is a significant difference between oral Scores between indiviudals who are Black and Hispanic, and there is a significant difference between those who are Hispanic and White. But there is no significant difference between those who are Black and White. Meaning that the group who stands out are those that are Hispanic while looking at the oral exams
+pairwise.t.test(Ricci$Written,Ricci$Race,p.adj=&quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  Ricci$Written and Ricci$Race 
+## 
+##   B       H     
+## H 0.0087  -     
+## W 6.4e-07 0.0694
+## 
+## P value adjustment method: none</code></pre>
+<pre class="r"><code>#There is a significant difference between written scores for individuals who are balck and Hispanic, and those who are black and white, but there is no significant difference when looking at those who are hispanic and White. Meaning that there is significant difference in Written scores for people whos race is black.
+#So far I ran 1 Manova, 2 Anovas, 6 T-test. I did 2 pair-wise T test which is equivalent to 6 due to the each one looking at 3 categories for a total of 9 test. 
+#Since we conducted 6 hypothesis test (Post-hoc) the probablity of have at least one type 1 error is 0.26490810937 (1-.95^6)
+#bonferoni Correction we will divide alpha which is .05 by 6 to get a new alpha of .0833
+#The Assumptions for an Anova are Random Sample/Independent Observations, Independent Samples, Normal Distribution of each group, Equal Variance. I think one of the assumptions that would be broken would be the sample size of the Hispanic Race due to the fact that they have a smaller sample size the rest. With that the variance of the samples is most likely going to be affected since the White race has a value which is nearly trippled that
+Ricci%&gt;%count(Race)</code></pre>
+<pre><code>## # A tibble: 3 x 2
+##   Race      n
+##   &lt;fct&gt; &lt;int&gt;
+## 1 B        27
+## 2 H        23
+## 3 W        68</code></pre>
+<p>##<em>Randomization Test</em></p>
+<pre class="r"><code>#Oral Score is the same for all 3 Races:Ho
+#Oral Score is different between all 3 Races:Ha
+#Very Confused on this part. Since my Categorical Variable has 3 categories rather than 2 I did the mean for Black Vs White, Black vs Hispanic, and for Hispanic vs White. The only example of the randomization test I saw was from lecture 14 and there was only two categories. In this case since there is 3 I looked at the means for all 3 added the means together than averaged the means of the means. 
+
+rand_dist&lt;-vector()
+for(i in 1:5000){
+  new&lt;-data.frame(Oral=sample(Ricci$Oral),Race=Ricci$Race)
+  rand_dist[i]&lt;-((mean(new[new$Race==&quot;B&quot;,]$Oral)-
+    mean(new[new$Race==&quot;H&quot;,]$Oral))+
+    (mean(new[new$Race==&quot;B&quot;,]$Oral)-   
+    mean(new[new$Race==&quot;W&quot;,]$Oral))+
+    (mean(new[new$Race==&quot;H&quot;,]$Oral)-
+     mean(new[new$Race==&quot;W&quot;,]$Oral)))
+}
+{hist(rand_dist,main = &quot;&quot;,ylab = &quot;&quot;);abline(v=-0.1293487,col=&quot;red&quot;)}</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-3-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>mean(rand_dist&gt;-0.1293487)*2</code></pre>
+<pre><code>## [1] 1.0152</code></pre>
+<pre class="r"><code>#Pvalue is close to one so fail to reject the null hypopthesis. Meaning that the data is not significant.</code></pre>
+<pre class="r"><code>#linear regression
+
+library(lmtest)
+library(sandwich)
+fit&lt;-lm(Combine~Race+Written,data = Ricci)
+summary(fit)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Combine ~ Race + Written, data = Ricci)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -8.3178 -3.4880  0.1479  3.0726 11.9852 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 15.41671    2.84549   5.418  3.4e-07 ***
+## RaceH       -3.92920    1.28710  -3.053  0.00282 ** 
+## RaceW        0.18409    1.11575   0.165  0.86924    
+## Written      0.75983    0.04272  17.788  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 4.402 on 114 degrees of freedom
+## Multiple R-squared:  0.7858, Adjusted R-squared:  0.7801 
+## F-statistic: 139.4 on 3 and 114 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>ggplot(Ricci,aes(x=Written, y=Combine, group=Race))+geom_point(aes(Color=Race))+geom_smooth(method = &quot;lm&quot;,formula = y~1,fullrange=T,aes(color=Race))+theme(legend.position = c(.95,.15))+xlab(&quot;&quot;)</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-4-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>resids&lt;-fit$residuals
+fitvals&lt;-fit$fitted.values
+ggplot()+geom_point(aes(fitvals,resids))+geom_hline(yintercept = 0,color=&#39;Red&#39;)#linear</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-4-2.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot()+geom_qq(aes(sample=resids))+geom_qq_line(aes(sample=resids))#this graph looks very off but the test ran below say that the normality is okay</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-4-3.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ks.test(resids,&quot;pnorm&quot;,mean=0,sd(resids))#P value is .8641 meaning we fail to reject the null which is that the distribution is normal </code></pre>
+<pre><code>## 
+##  One-sample Kolmogorov-Smirnov test
+## 
+## data:  resids
+## D = 0.055244, p-value = 0.8641
+## alternative hypothesis: two-sided</code></pre>
+<pre class="r"><code>shapiro.test(resids)#pvalue is .237 fail to reject the null that the distribution is normal</code></pre>
+<pre><code>## 
+##  Shapiro-Wilk normality test
+## 
+## data:  resids
+## W = 0.98549, p-value = 0.237</code></pre>
+<pre class="r"><code>#it appears to meet all the assumptions but im going to recompute the regression regardless with robust standard errors
+fit&lt;-lm(Combine~Race+Written,data = Ricci)
+bptest(fit)#Pvalue is non significant still going to continue</code></pre>
+<pre><code>## 
+##  studentized Breusch-Pagan test
+## 
+## data:  fit
+## BP = 1.8997, df = 3, p-value = 0.5935</code></pre>
+<pre class="r"><code>summary(fit)$coef[,1:2]</code></pre>
+<pre><code>##               Estimate Std. Error
+## (Intercept) 15.4167112 2.84549072
+## RaceH       -3.9292047 1.28710199
+## RaceW        0.1840890 1.11575296
+## Written      0.7598327 0.04271679</code></pre>
+<pre class="r"><code>coeftest(fit,vcov=vcovHC(fit))[,1:2]</code></pre>
+<pre><code>##               Estimate Std. Error
+## (Intercept) 15.4167112  2.7503934
+## RaceH       -3.9292047  1.2362929
+## RaceW        0.1840890  1.1578403
+## Written      0.7598327  0.0417934</code></pre>
+<pre class="r"><code>#when looking at the changes in the standard error, the changes are not that big they are changes by decimals only. 
+#Just a reminder that the R2 is the proportion of variation in the response varible and that is .7859 the Adjusted R2 is .7801 and this value should be more conservative.</code></pre>
+<p>##<em>Bootstrapped Standard Error</em></p>
+<pre class="r"><code>boot_dat&lt;-Ricci[sample(nrow(Ricci),replace = TRUE),]
+ fit2&lt;-lm(Combine~Race+Written,data = boot_dat)
+samp_distn&lt;-replicate(5000,{
+  boot_dat&lt;-Ricci[sample(nrow(Ricci),replace = TRUE),]
+  fit2&lt;-lm(Combine~Race+Written,data = boot_dat)
+  coef(fit2)
+})
+summary(fit2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Combine ~ Race + Written, data = boot_dat)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -8.5395 -3.4053  0.2342  3.6525  8.2582 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 15.90058    2.71400   5.859  4.6e-08 ***
+## RaceH       -1.77340    1.28992  -1.375    0.172    
+## RaceW        1.26850    1.12942   1.123    0.264    
+## Written      0.73943    0.04104  18.015  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 4.448 on 114 degrees of freedom
+## Multiple R-squared:  0.787,  Adjusted R-squared:  0.7814 
+## F-statistic: 140.4 on 3 and 114 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>samp_distn%&gt;%t%&gt;%as.data.frame%&gt;%summarise_all(sd)#Est. Se</code></pre>
+<pre><code>##   (Intercept)    RaceH    RaceW    Written
+## 1    2.699615 1.206687 1.132319 0.04132231</code></pre>
+<pre class="r"><code>samp_distn%&gt;%t%&gt;%as.data.frame%&gt;%gather%&gt;%group_by(key)%&gt;%summarize(lower=quantile(value,.025),upper=quantile(value,.975))</code></pre>
+<pre><code>## # A tibble: 4 x 3
+##   key          lower  upper
+##   &lt;chr&gt;        &lt;dbl&gt;  &lt;dbl&gt;
+## 1 (Intercept) 10.2   20.9  
+## 2 RaceH       -6.30  -1.54 
+## 3 RaceW       -2.09   2.34 
+## 4 Written      0.679  0.840</code></pre>
+<pre class="r"><code>#while compairng the pvalues from this section to the pvlaues from above, the same pvalues that were significant above are still significant in this case. In addition to that the only one that isnt significnat is Being White. While looking at the SE, they seem to have gotten smaller and smaller with each test that we have performed on them.</code></pre>
+<p>##<em>Logistic Regression</em></p>
+<pre class="r"><code>library(plotROC)
+Ricci$Position&lt;-ifelse(Ricci$Position==&quot;Captain&quot;,1,0)
+fit3&lt;-glm(Position~Race+Oral+Written,data = Ricci,family = binomial(link = &quot;logit&quot;))
+coeftest(fit3)</code></pre>
+<pre><code>## 
+## z test of coefficients:
+## 
+##              Estimate Std. Error z value Pr(&gt;|z|)   
+## (Intercept) -2.908069   1.611023 -1.8051 0.071058 . 
+## RaceH        0.748824   0.674183  1.1107 0.266691   
+## RaceW        0.298058   0.564007  0.5285 0.597177   
+## Oral         0.051282   0.019162  2.6762 0.007446 **
+## Written     -0.020184   0.022498 -0.8972 0.369636   
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>#Oral is significant meaning that it increases the log-odds of Position. So i am assuming the better verbal skills these people have makes them more likely to be in a certain position.
+probs&lt;-predict(fit3,type=&quot;response&quot;)
+mean(probs&gt;.99)</code></pre>
+<pre><code>## [1] 0</code></pre>
+<pre class="r"><code>class_diag&lt;-function(probs,truth){
+ tab&lt;-table(factor(probs&gt;.5,levels=c(&quot;FALSE&quot;,&quot;TRUE&quot;)),truth)
+ acc=sum(diag(tab))/sum(tab)
+ sens=tab[2,2]/colSums(tab)[2]
+ spec=tab[1,1]/colSums(tab)[1]
+ ppv=tab[2,2]/rowSums(tab)[2]
+ if(is.numeric(truth)==FALSE &amp; is.logical(truth)==FALSE) truth&lt;-as.numeric(truth)-1
+ ord&lt;-order(probs, decreasing=TRUE)
+ probs &lt;- probs[ord]; truth &lt;- truth[ord]
+ TPR=cumsum(truth)/max(1,sum(truth))
+ FPR=cumsum(!truth)/max(1,sum(!truth))
+ dup&lt;-c(probs[-1]&gt;=probs[-length(probs)], FALSE)
+ TPR&lt;-c(0,TPR[!dup],1); FPR&lt;-c(0,FPR[!dup],1)
+ n &lt;- length(TPR)
+ auc&lt;- sum( ((TPR[-1]+TPR[-n])/2) * (FPR[-1]-FPR[-n]) )
+ data.frame(acc,sens,spec,ppv,auc)
+} 
+class_diag(probs,Ricci$Position)</code></pre>
+<pre><code>##         acc     sens      spec ppv       auc
+## 1 0.6525424 0.195122 0.8961039 0.5 0.6639214</code></pre>
+<pre class="r"><code>table(predict=as.numeric(probs&gt;.5),truth=Ricci$Position)%&gt;%addmargins</code></pre>
+<pre><code>##        truth
+## predict   0   1 Sum
+##     0    69  33 102
+##     1     8   8  16
+##     Sum  77  41 118</code></pre>
+<pre class="r"><code>8/41#TPR/Sens</code></pre>
+<pre><code>## [1] 0.195122</code></pre>
+<pre class="r"><code>69/77#TNR/Spec</code></pre>
+<pre><code>## [1] 0.8961039</code></pre>
+<pre class="r"><code>(69+8)/118#Accuracy</code></pre>
+<pre><code>## [1] 0.6525424</code></pre>
+<pre class="r"><code>#With the AUC being .66 this makes this a really bad fit. Meaning that currently with the current fit we can be misclasssifying things. The true positive rate is .19 the true negative rate is .89 and accuracy is .65 making this a poor model
+ROCplot&lt;-ggplot(Ricci)+geom_roc(aes(d=Ricci$Position,m=predict(fit3,type=&quot;response&quot;)),n.cuts=0)
+ROCplot</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-6-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>calc_auc(ROCplot)</code></pre>
+<pre><code>##   PANEL group       AUC
+## 1     1    -1 0.6639214</code></pre>
+<pre class="r"><code>#The AUC matches with that from above. As stated above, due to the AUC being what it is, it makes it a poor represenation. Also the way the graph s, it means that the it is hard to predict Position based off of the values that we decided to use.</code></pre>
+<p>##<em>10-fold</em></p>
+<pre class="r"><code>set.seed(1234)
+k=10
+
+data1&lt;-Ricci[sample(nrow(Ricci)),]
+folds&lt;-cut(seq(1:nrow(Ricci)),breaks=k,labels=FALSE) 
+diags&lt;-NULL
+
+for(i in 1:k){
+ train&lt;-data1[folds!=i,]
+ test&lt;-data1[folds==i,]
+ truth2&lt;-test$Position
+
+ fit4&lt;-glm(Position~Race+Oral+Written,data=train,family=&quot;binomial&quot;)
+ probs2&lt;-predict(fit4,newdata = test,type=&quot;response&quot;)
+ diags&lt;-rbind(diags,class_diag(probs2,truth2))
+}
+apply(diags,2,mean)</code></pre>
+<pre><code>##       acc      sens      spec       ppv       auc 
+## 0.6174242 0.1559524 0.8652778 0.3666667 0.5849438</code></pre>
+<pre class="r"><code>#In this step, one thing that was noted was that there is change in Accuarcy and TPR they both decrease meaning that this new model still is not the best fit. In addition to that the AUC also got smaller meaning that these predictors are still not a great way of predicting Postion.</code></pre>
+<p>##<em>LASSO</em></p>
+<pre class="r"><code>fit5&lt;-lm(Combine~.,data=Ricci)
+summary(fit5)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Combine ~ ., data = Ricci)
+## 
+## Residuals:
+##        Min         1Q     Median         3Q        Max 
+## -3.944e-13 -4.410e-15  2.810e-15  1.037e-14  5.158e-14 
+## 
+## Coefficients:
+##               Estimate Std. Error    t value Pr(&gt;|t|)    
+## (Intercept)  3.297e-14  2.827e-14  1.166e+00    0.246    
+## RaceH       -2.810e-15  1.192e-14 -2.360e-01    0.814    
+## RaceW        2.989e-15  9.892e-15  3.020e-01    0.763    
+## Position    -7.913e-15  7.804e-15 -1.014e+00    0.313    
+## Oral         4.000e-01  3.429e-16  1.166e+15   &lt;2e-16 ***
+## Written      6.000e-01  4.022e-16  1.492e+15   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 3.897e-14 on 112 degrees of freedom
+## Multiple R-squared:      1,  Adjusted R-squared:      1 
+## F-statistic: 1.358e+30 on 5 and 112 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>library(glmnet)
+y&lt;-as.matrix(Ricci$Position)
+x&lt;-model.matrix(fit5)[,-1]
+x&lt;-scale(x)
+cv&lt;-cv.glmnet(x,y,family=&quot;binomial&quot;)
+lasso&lt;-glmnet(x,y,family = &quot;binomial&quot;, lambda = cv$lambda.1se)
+coef(lasso)</code></pre>
+<pre><code>## 6 x 1 sparse Matrix of class &quot;dgCMatrix&quot;
+##                    s0
+## (Intercept) -2.556684
+## RaceH        .       
+## RaceW        .       
+## Position     7.026267
+## Oral         .       
+## Written      .</code></pre>
+<pre class="r"><code>#position is the only one with a value next to it so it will be used in the 10 fold CV for the next part.
+set.seed(1234)
+data2&lt;-Ricci[sample(nrow(Ricci)),]
+folds&lt;-cut(seq(1:nrow(Ricci)),breaks = k,labels = FALSE)
+
+diags&lt;-NULL
+for(i in 1:k){
+  train2&lt;-data2[folds!=i,]
+  test2&lt;-data2[folds==i,]
+  truth3&lt;-test2$Combine
+  
+  fit6&lt;-lm(Combine~Position,data=train2)
+  probs4&lt;-predict(fit6,newdata = test2,type = &quot;response&quot;)
+  preds&lt;-ifelse(probs4&gt;.5,1,0)
+  
+  diags&lt;-rbind(diags,class_diag(probs4,truth3))
+}
+diags%&gt;%summarize_all(mean)</code></pre>
+<pre><code>##          acc sens spec        ppv auc
+## 1 0.08484848    1    0 0.08484848   1</code></pre>
+<pre class="r"><code>summary(fit5)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Combine ~ ., data = Ricci)
+## 
+## Residuals:
+##        Min         1Q     Median         3Q        Max 
+## -3.944e-13 -4.410e-15  2.810e-15  1.037e-14  5.158e-14 
+## 
+## Coefficients:
+##               Estimate Std. Error    t value Pr(&gt;|t|)    
+## (Intercept)  3.297e-14  2.827e-14  1.166e+00    0.246    
+## RaceH       -2.810e-15  1.192e-14 -2.360e-01    0.814    
+## RaceW        2.989e-15  9.892e-15  3.020e-01    0.763    
+## Position    -7.913e-15  7.804e-15 -1.014e+00    0.313    
+## Oral         4.000e-01  3.429e-16  1.166e+15   &lt;2e-16 ***
+## Written      6.000e-01  4.022e-16  1.492e+15   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 3.897e-14 on 112 degrees of freedom
+## Multiple R-squared:      1,  Adjusted R-squared:      1 
+## F-statistic: 1.358e+30 on 5 and 112 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>summary(fit6)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Combine ~ Position, data = train2)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -22.2451  -7.2351   0.1729   5.4719  21.9229 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   68.177      1.130  60.342   &lt;2e-16 ***
+## Position       3.161      1.912   1.653    0.101    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 9.385 on 104 degrees of freedom
+## Multiple R-squared:  0.0256, Adjusted R-squared:  0.01624 
+## F-statistic: 2.733 on 1 and 104 DF,  p-value: 0.1013</code></pre>
+<pre class="r"><code>#Since the response is going to be a Numeric value, I am going to use the Residual Standard Error from fit5 to compare it to my lasso fit which is fit 6. In fit 5 I wanted to see if the Combine score was predicted well by all the other variables. Once performing a Lasso the only varible that came back was position. A 10 fold CV was then performed on the Combined Score only looking at postion. The residual standard error came back as 9.102 which was greater than that Residual standard error from fit 5 which was  4.084e-15. Since the value was higher, it is not a better fit. </code></pre>

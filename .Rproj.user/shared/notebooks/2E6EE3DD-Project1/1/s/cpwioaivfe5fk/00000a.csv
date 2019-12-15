@@ -1,0 +1,2 @@
+"0",""
+"0","worlddata%>%filter(Region==""Western Europe"")%>%select(Country, `Happiness Rank`,total_litres_of_pure_alcohol)%>%arrange(`Happiness Rank`)"

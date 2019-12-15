@@ -1,0 +1,2 @@
+"0","ggplot(worlddata,aes(Region))+geom_bar(aes(y=worlddata$beer_servings,fill=Region),"
+"0","stat=""summary"", fun.y=""mean"")+scale_fill_brewer(palette = ""Paired"")+scale_x_discrete(labels=c(""ANZ"",""CEE"",""EA"",""LAC"",""MENA"",""NA"",""SEA"",""SA"",""SSA"",""WE""))+labs( x = ""Region"", y = ""Beer Servings"",title =""Average Beer Servings for the Regions of the World"")+theme_minimal()"

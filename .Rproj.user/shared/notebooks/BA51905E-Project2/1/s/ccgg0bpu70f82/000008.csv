@@ -1,0 +1,7 @@
+"0","mean(rand_dist>-0.1293487)*2"
+"1","[1]"
+"1"," 1.0228"
+"1","
+"
+"0","#Pvalue is close to one so fail to reject the null hypopthesis. Meaning that the data is not significant."
+"0",""
